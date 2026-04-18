@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{client_name}} - Wippli</title>
+    <link rel="icon" type="image/png" href="https://app.wippli.ai/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        :root {
+            --blue: {{brand_primary}};
+            --blue-light: {{brand_background}};
+            --green: var(--blue-light);
+            --orange: {{brand_accent}};
+            --red: #ef4444;
+            --dark: {{brand_contrast}};
+            --gray-600: {{brand_copyText}};
+            --gray-400: #94a3b8;
+            --gray-200: #e2e8f0;
+            --gray-100: {{brand_whiteCards}};
+            --white: {{brand_placeholder}};
+            --teal-dark: color-mix(in srgb, var(--blue-light), black 25%);
+            --teal-light: color-mix(in srgb, var(--blue-light), white 30%);
+            --page-bg: color-mix(in srgb, var(--blue-light) 15%, white);
+            --accent-hover: color-mix(in srgb, var(--orange), black 20%);
+        }
+        
+        html, body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--page-bg);
+            color: var(--dark);
+            -webkit-font-smoothing: antialiased;
+        }
+        
+        .app {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--white);
+            overflow: hidden;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 11px 30px;
+            background: var(--white);
+            border-bottom: 1px solid var(--gray-200);
+        }
+        
+        .logo {
+            height: 22px;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-right: 50px;
+        }
+        
+        .header-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            background: var(--page-bg);
+            border-radius: 100px;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--gray-600);
+        }
+        
+        .lang-btn {
+            padding: 8px 12px;
+            background: transparent;
+            border: none;
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--gray-400);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.15s;
+        }
+        
+        .lang-btn:hover, .lang-btn.active {
+            background: var(--blue-light);
+            color: var(--blue);
+        }
+
+        .main-scroll {
+            flex: 1;
+            overflow-y: auto;
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            height: calc(100vh - 48px - 50px);
+            padding: 30px;
+            gap: 24px;
+            scroll-snap-align: start;
+        }
+
+        .hero-banner {
+            background: var(--blue-light);
+            border-radius: 24px;
+            padding: 32px;
+            color: #ffffff;
+            text-decoration: none;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            gap: 40px;
+            transition: all 0.25s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .hero-banner:hover {
+            transform: translateY(-4px);
+        }
+        
+        .hero-left {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .hero-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 20px;
+        }
+        
+        .hero-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .hero-client {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 4px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .hero-doc {
+            font-size: 0.85em;
+            opacity: 0.8;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .hero-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(0,0,0,0.08);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .hero-icon img {
+            width: 48px;
+            height: 48px;
+        }
+        
+        .hero-stats {
+            display: flex;
+            gap: 40px;
+        }
+        
+        .hero-stat {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .hero-stat-value {
+            font-size: 2em;
+            font-weight: 800;
+            line-height: 1;
+            color: #ffffff;
+        }
+        
+        .hero-stat-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+            margin-top: 4px;
+        }
+        
+        .confidence-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 16px;
+            min-width: 200px;
+        }
+        
+        .conf-avg-display {
+            text-align: right;
+        }
+        
+        .conf-avg-label {
+            font-size: 0.7em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+            margin-bottom: 4px;
+        }
+        
+        .conf-avg-value {
+            font-size: 3em;
+            font-weight: 800;
+            line-height: 1;
+            color: #ffffff;
+        }
+        
+        .confidence-bar-vertical {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+        
+        .conf-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .conf-bar-bg {
+            flex: 1;
+            height: 6px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .conf-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .conf-bar-fill.high { background: var(--dark); }
+        .conf-bar-fill.medium { background: var(--orange); }
+        .conf-bar-fill.low { background: var(--red); }
+        
+        .conf-row-label {
+            font-size: 0.7em;
+            opacity: 0.8;
+            width: 50px;
+        }
+        
+        .conf-row-value {
+            font-size: 0.8em;
+            font-weight: 700;
+            width: 24px;
+            text-align: right;
+        }
+
+        .client-buttons {
+            display: flex;
+            gap: 12px;
+            flex-shrink: 0;
+        }
+        
+        .client-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            background: color-mix(in srgb, var(--blue) 8%, transparent);
+            border: none;
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--blue);
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: all 0.2s ease;
+        }
+        
+        .client-btn:hover {
+            background: color-mix(in srgb, var(--blue-light) 25%, transparent);
+            transform: translateY(-2px);
+        }
+        
+        .client-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: var(--dark);
+        }
+        
+        .client-btn.preso-btn {
+            background: var(--blue-light);
+            color: var(--dark);
+            font-weight: 600;
+        }
+        .client-btn.preso-btn:hover {
+            background: var(--teal-dark);
+            color: var(--white);
+        }
+        .client-btn.preso-btn svg {
+            stroke: var(--dark);
+        }
+        .client-btn.preso-btn:hover svg {
+            stroke: var(--white);
+        }
+        
+        .client-btn.new-wippli {
+            background: {{brand_accent}};
+            color: var(--white);
+            flex: 0 0 auto;
+            width: 48px;
+            height: 48px;
+            padding: 0;
+        }
+        
+        .client-btn.new-wippli:hover {
+            background: var(--accent-hover);
+        }
+        
+        .client-btn.new-wippli svg {
+            stroke: var(--white);
+        }
+        
+        .plus-icon {
+            font-size: 2em;
+            font-weight: 300;
+            line-height: 1;
+        }
+        
+        .client-btn.date {
+            cursor: default;
+        }
+        
+        .client-btn.date:hover {
+            background: color-mix(in srgb, var(--blue) 8%, transparent);
+            transform: none;
+        }
+
+        .section-title {
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--gray-400);
+            margin-bottom: 6px;
+        }
+        
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            flex: 1;
+            min-height: 0;
+        }
+        
+        .action-tile {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 20px;
+            padding: 30px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.25s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .action-tile:nth-child(1) { grid-column: span 2; background: var(--orange); }
+        .action-tile:nth-child(2) { background: var(--blue-light); }
+        .action-tile:nth-child(3) { background: var(--dark); }
+        .action-tile:nth-child(4) { background: var(--blue-light); }
+        .action-tile:nth-child(5) { background: var(--dark); }
+        .action-tile:nth-child(6) { grid-column: span 2; background: var(--blue-light); }
+        .action-tile:nth-child(7) { grid-column: span 2; background: var(--blue-light); }
+        .action-tile:nth-child(8) { background: var(--dark); }
+        .action-tile:nth-child(9) { background: var(--dark); }
+        
+        .action-tile .tile-icon svg {
+            stroke: var(--white);
+            width: 40px;
+            height: 40px;
+            stroke-width: 1.5;
+        }
+        
+        .action-tile:nth-child(1) .tile-icon svg {
+            width: 48px;
+            height: 48px;
+        }
+        
+        .action-tile .tile-label {
+            color: var(--white);
+            font-size: 0.8em;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+        
+        .action-tile:nth-child(1) .tile-label {
+            font-size: 1em;
+        }
+        
+        .action-tile:hover {
+            transform: translateY(-4px);
+        }
+        
+        .action-tile:nth-child(2) .tile-label,
+        .action-tile:nth-child(4) .tile-label,
+        .action-tile:nth-child(6) .tile-label,
+        .action-tile:nth-child(7) .tile-label {
+            color: var(--dark);
+        }
+        
+        .action-tile:nth-child(2) .tile-icon svg,
+        .action-tile:nth-child(4) .tile-icon svg,
+        .action-tile:nth-child(6) .tile-icon svg,
+        .action-tile:nth-child(7) .tile-icon svg {
+            stroke: var(--dark);
+        }
+
+        .questions-section {
+            padding: 30px;
+            scroll-snap-align: start;
+        }
+        
+        .questions-card {
+            background: var(--white);
+            border: 1px solid var(--blue);
+            border-radius: 20px;
+            padding: 30px;
+        }
+        
+        .questions-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+        
+        .questions-title {
+            font-size: 1em;
+            font-weight: 700;
+            color: var(--blue);
+        }
+        
+        .questions-count {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: var(--blue);
+        }
+        
+        .question-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        
+        .question-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .q-number {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--blue-light);
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: 700;
+            color: var(--blue);
+        }
+        
+        .q-text {
+            flex: 1;
+            font-size: 0.9em;
+            color: var(--blue);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .q-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+        
+        .q-dot.high { background: var(--green); }
+        .q-dot.medium { background: var(--orange); }
+        .q-dot.low { background: var(--red); }
+
+        .footer {
+            padding: 16px 24px;
+            background: var(--white);
+            border-top: 1px solid var(--gray-200);
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75em;
+            color: var(--gray-400);
+        }
+
+        @media (max-width: 1100px) {
+            .hero-stats { gap: 28px; }
+            .hero-stat-value { font-size: 1.8em; }
+            .confidence-section { min-width: 180px; gap: 12px; }
+            .conf-avg-value { font-size: 2.5em; }
+            .action-grid { gap: 14px; }
+            .action-tile { padding: 24px; gap: 16px; }
+            .action-tile .tile-icon svg { width: 36px; height: 36px; }
+            .tile-label { font-size: 0.75em; }
+        }
+        
+        @media (max-width: 900px) {
+            .main-content {
+                height: auto;
+                min-height: calc(100vh - 48px - 50px);
+                padding: 30px;
+                gap: 20px;
+            }
+            .hero-banner { gap: 30px; padding: 28px; border-radius: 20px; }
+            .hero-icon { width: 52px; height: 52px; border-radius: 14px; }
+            .hero-icon img { width: 40px; height: 40px; }
+            .confidence-section { min-width: 160px; gap: 10px; }
+            .conf-avg-value { font-size: 2.2em; }
+            .hero-stats { gap: 20px; }
+            .hero-stat-value { font-size: 1.5em; }
+            .section-title { margin-bottom: 8px; }
+            .action-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
+            .action-tile { padding: 20px; border-radius: 18px; gap: 14px; }
+            .action-tile:nth-child(1) { grid-column: span 3; }
+            .action-tile:nth-child(6) { grid-column: span 2; }
+            .action-tile:nth-child(7) { grid-column: span 2; }
+            .action-tile .tile-icon svg { width: 32px; height: 32px; }
+            .action-tile:nth-child(1) .tile-icon svg { width: 40px; height: 40px; }
+            .tile-label { font-size: 0.7em; line-height: 1.2; }
+            .action-tile:nth-child(1) .tile-label { font-size: 0.85em; }
+            .client-btn { padding: 14px 18px; border-radius: 12px; }
+            .questions-section { padding: 30px; padding-top: 0; }
+            .questions-card { padding: 28px; border-radius: 18px; }
+        }
+        
+        @media (max-width: 650px) {
+            .main-content { padding: 24px; gap: 18px; }
+            .hero-banner { padding: 24px; border-radius: 18px; gap: 24px; }
+            .hero-client { font-size: 1.1em; }
+            .hero-doc { font-size: 0.8em; }
+            .hero-icon { width: 48px; height: 48px; border-radius: 12px; }
+            .hero-icon img { width: 36px; height: 36px; }
+            .hero-stats { gap: 16px; flex-wrap: wrap; }
+            .hero-stat-value { font-size: 1.3em; }
+            .hero-stat-label { font-size: 0.6em; }
+            .confidence-section { min-width: 140px; gap: 8px; }
+            .conf-avg-value { font-size: 1.8em; }
+            .conf-row-label { font-size: 0.65em; width: 44px; }
+            .client-buttons { flex-wrap: wrap; gap: 10px; }
+            .client-btn { padding: 12px 16px; font-size: 0.75em; border-radius: 12px; flex: 1 1 calc(50% - 5px); min-width: 0; }
+            .client-btn svg { width: 16px; height: 16px; }
+            .section-title { font-size: 0.7em; margin-bottom: 10px; }
+            .action-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+            .action-tile { padding: 16px; border-radius: 16px; gap: 12px; }
+            .action-tile:nth-child(1) { grid-column: span 2; }
+            .action-tile:nth-child(6) { grid-column: span 1; }
+            .action-tile:nth-child(7) { grid-column: span 1; }
+            .action-tile .tile-icon svg { width: 30px; height: 30px; }
+            .action-tile:nth-child(1) .tile-icon svg { width: 36px; height: 36px; }
+            .tile-label { font-size: 0.68em; }
+            .action-tile:nth-child(1) .tile-label { font-size: 0.8em; }
+            .questions-section { padding: 24px; padding-top: 0; }
+            .questions-card { padding: 24px; border-radius: 16px; }
+            .questions-title { font-size: 0.9em; }
+            .questions-count { font-size: 0.75em; }
+            .q-number { width: 32px; height: 32px; font-size: 0.75em; border-radius: 10px; }
+            .q-text { font-size: 0.85em; }
+            .header-pill { display: none; }
+            .header { padding: 13px 24px; }
+        }
+        
+        @media (max-width: 400px) {
+            .header { padding: 10px 20px; }
+            .logo { height: 18px; }
+            .lang-btn { padding: 6px 10px; font-size: 0.75em; }
+            .footer { padding: 12px 20px; font-size: 0.68em; }
+            .main-content { padding: 16px; padding-bottom: 16px; gap: 12px; height: auto; min-height: auto; scroll-snap-align: start; }
+            .hero-banner { padding: 18px; border-radius: 14px; gap: 16px; }
+            .hero-client { font-size: 1em; white-space: normal; overflow: visible; text-overflow: unset; }
+            .hero-doc { font-size: 0.75em; white-space: normal; overflow: visible; text-overflow: unset; }
+            .hero-top { gap: 12px; }
+            .hero-icon { width: 44px; height: 44px; border-radius: 10px; }
+            .hero-icon img { width: 32px; height: 32px; }
+            .hero-stats { gap: 12px; }
+            .hero-stat-value { font-size: 1.2em; }
+            .hero-stat-label { font-size: 0.6em; }
+            .confidence-section { margin-top: 5px; align-self: flex-end; min-width: 130px; gap: 8px; }
+            .conf-avg-label { font-size: 0.65em; }
+            .conf-avg-value { font-size: 1.5em; }
+            .conf-row-label { font-size: 0.6em; width: 40px; }
+            .conf-row-value { font-size: 0.7em; width: 22px; }
+            .conf-bar-bg { height: 5px; }
+            .client-buttons { gap: 8px; }
+            .client-btn { padding: 10px 12px; font-size: 0.7em; }
+            .client-btn.preso-btn { background: var(--blue-light); color: var(--dark); font-weight: 600; }
+            .client-btn.preso-btn:hover { background: var(--teal-dark); color: var(--white); }
+            .client-btn.preso-btn svg { stroke: var(--dark); }
+            .client-btn.preso-btn:hover svg { stroke: var(--white); }
+            .client-btn.new-wippli { width: 42px; height: 42px; }
+            .plus-icon { font-size: 1.8em; }
+            .client-btn svg { width: 14px; height: 14px; }
+            .section-title { font-size: 0.65em; margin-bottom: 4px; }
+            .action-grid { gap: 10px; }
+            .action-tile { padding: 14px; border-radius: 14px; gap: 12px; }
+            .action-tile:nth-child(2) { scroll-snap-align: start; scroll-margin-top: 10px; }
+            .action-tile .tile-icon svg { width: 28px; height: 28px; }
+            .action-tile:nth-child(1) .tile-icon svg { width: 32px; height: 32px; }
+            .tile-label { font-size: 0.65em; }
+            .action-tile:nth-child(1) .tile-label { font-size: 0.75em; }
+            .questions-section { padding: 16px; }
+            .questions-card { padding: 16px; border-radius: 14px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <header class="header">
+            <img src="{{creator_logo_url}}" alt="{{creator_company_name}}" class="logo">
+            <div class="header-actions">
+                <div class="header-pill">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    ID: {{wippli_id}}
+                </div>
+                <div style="width: 16px;"></div>
+                <button class="lang-btn active" onclick="setLang('en')">EN</button>
+                <button class="lang-btn" onclick="setLang('de')">DE</button>
+                <button class="lang-btn" onclick="setLang('fr')">FR</button>
+            </div>
+        </header>
+        
+        <div class="main-scroll">
+            <div class="main-content">
+                <a href="{{doc_web_url}}" download class="hero-banner">
+                    <div class="hero-left">
+                        <div class="hero-top">
+                            <div class="hero-icon">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="32" height="32"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+                            </div>
+                            <div class="hero-info">
+                                <div class="hero-client">{{client_name}}</div>
+                                <div class="hero-doc">{{doc_name}}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="hero-stats">
+                            <div class="hero-stat">
+                                <span class="hero-stat-value">{{section_count}}</span>
+                                <span class="hero-stat-label" data-i18n="sections">Sections</span>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="hero-stat-value">{{problem_count}}</span>
+                                <span class="hero-stat-label" data-i18n="problems">Problems</span>
+                            </div>
+                            <div class="hero-stat">
+                                <span class="hero-stat-value">{{initiative_count}}</span>
+                                <span class="hero-stat-label" data-i18n="initiatives">Initiatives</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="confidence-section">
+                        <div class="conf-avg-display">
+                            <div class="conf-avg-label" data-i18n="swotAnalysis">SWOT Analysis</div>
+                            <div class="conf-avg-value">{{swot_total}}</div>
+                        </div>
+                        <div class="confidence-bar-vertical">
+                            <div class="conf-row">
+                                <span class="conf-row-label">S</span>
+                                <div class="conf-bar-bg">
+                                    <div class="conf-bar-fill high" style="width: {{strengths}}%"></div>
+                                </div>
+                                <span class="conf-row-value">{{strengths}}</span>
+                            </div>
+                            <div class="conf-row">
+                                <span class="conf-row-label">W</span>
+                                <div class="conf-bar-bg">
+                                    <div class="conf-bar-fill medium" style="width: {{weaknesses}}%"></div>
+                                </div>
+                                <span class="conf-row-value">{{weaknesses}}</span>
+                            </div>
+                            <div class="conf-row">
+                                <span class="conf-row-label">O</span>
+                                <div class="conf-bar-bg">
+                                    <div class="conf-bar-fill high" style="width: {{opportunities}}%"></div>
+                                </div>
+                                <span class="conf-row-value">{{opportunities}}</span>
+                            </div>
+                            <div class="conf-row">
+                                <span class="conf-row-label">T</span>
+                                <div class="conf-bar-bg">
+                                    <div class="conf-bar-fill low" style="width: {{threats}}%"></div>
+                                </div>
+                                <span class="conf-row-value">{{threats}}</span>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+                
+                <div class="client-buttons">
+                    <a href="{{creator_url_form}}" target="_blank" class="client-btn new-wippli">
+                        <span class="plus-icon">+</span>
+                    </a>
+                    <a href="{{website}}" target="_blank" class="client-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                        <span data-i18n="website">Website</span>
+                    </a>
+                    <a href="{{preso_edit_url}}" target="_blank" class="client-btn preso-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                        <span data-i18n="boardroomDeck">Boardroom Deck</span>
+                    </a>
+                    <a href="{{quick_action_store}}" target="_blank" class="client-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
+                        <span data-i18n="productPage">Product</span>
+                    </a>
+                    <div class="client-btn date">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        <span>{{report_generated_at}}</span>
+                    </div>
+                </div>
+                
+                <div class="section-title" data-i18n="quickActions">Quick Actions</div>
+                <div class="action-grid">
+                    <a href="{{doc_web_url}}" download class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
+                        <span class="tile-label" data-i18n="strategyReport">Download Report</span>
+                    </a>
+                    <a href="{{doc_web_url}}" target="_blank" class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>
+                        <span class="tile-label" data-i18n="viewOnline">View Online</span>
+                    </a>
+                    <a href="{{doc_share_url}}" target="_blank" class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></div>
+                        <span class="tile-label" data-i18n="shareDocument">Share Document</span>
+                    </a>
+                    <a href="{{creator_url_productStore}}" target="_blank" class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+                        <span class="tile-label" data-i18n="productPage">Product Page</span>
+                    </a>
+                    <a href="{{New_Wippli}}" target="_blank" class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg></div>
+                        <span class="tile-label" data-i18n="newAnalysis">New Analysis</span>
+                    </a>
+                    <a href="{{quick_action_store}}" target="_blank" class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
+                        <span class="tile-label" data-i18n="moorestratProduct">MooreStrat</span>
+                    </a>
+                    <a href="https://app.wippli.ai" target="_blank" class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h8"/><path d="M8 14h4"/></svg></div>
+                        <span class="tile-label" data-i18n="wippliHub">Wippli HUB</span>
+                    </a>
+                    <a href="{{doc_view_only_url}}" target="_blank" class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+                        <span class="tile-label" data-i18n="viewOnly">View Only Link</span>
+                    </a>
+                    <a href="{{creator_url_store}}" target="_blank" class="action-tile">
+                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
+                        <span class="tile-label" data-i18n="hubStore">HUB Store</span>
+                    </a>
+                </div>
+            </div>
+            
+            <div class="questions-section">
+                <div class="questions-card">
+                    <div class="questions-header">
+                        <span class="questions-title" data-i18n="strategySections">Strategy Sections</span>
+                        <span class="questions-count">{{section_count}} <span data-i18n="sections">sections</span></span>
+                    </div>
+                    {{ ($('CAPTURE_All').item.json.questions || []).slice(0, 5).map(q => `
+                    <div class="question-item">
+                        <div class="q-number">${q.question_id}</div>
+                        <div class="q-text">${q.question_text}</div>
+                        <div class="q-dot high"></div>
+                    </div>`).join('') }}
+                </div>
+            </div>
+        </div>
+        
+        <footer class="footer">
+            <span>&copy;<script>document.write(new Date().getFullYear())</script> {{creator_company_name}} HUB</span>
+            <span data-i18n="poweredBy">Powered by Wippli&reg;</span>
+        </footer>
+    </div>
+    
+    <script>
+    const translations = {
+        de: {
+            questions: 'Fragen', complete: 'Abgeschlossen', sections: 'Abschnitte', problems: 'Probleme', initiatives: 'Initiativen', swotAnalysis: 'SWOT Analyse',
+            high: 'Hoch', medium: 'Mittel', low: 'Niedrig', avgConfidence: 'Ø Konfidenz',
+            website: 'Webseite', boardroomDeck: 'Präsentation', quickActions: 'Schnellaktionen',
+            strategyReport: 'Strategiebericht', viewOnline: 'Online ansehen', shareDocument: 'Dokument teilen',
+            productPage: 'Produkt Seite', newAnalysis: 'Neue Analyse', moorestratProduct: 'MooreStrat',
+            viewOnly: 'Nur Ansicht', wippliHub: 'Wippli HUB', hubStore: 'HUB Store',
+            strategySections: 'Strategieabschnitte', poweredBy: 'Powered by Wippli®'
+        },
+        en: {
+            questions: 'Questions', complete: 'Complete', sections: 'Sections', problems: 'Problems', initiatives: 'Initiatives', swotAnalysis: 'SWOT Analysis',
+            high: 'High', medium: 'Medium', low: 'Low', avgConfidence: 'Avg Confidence',
+            website: 'Website', boardroomDeck: 'Boardroom Deck', quickActions: 'Quick Actions',
+            strategyReport: 'Strategy Report', viewOnline: 'View Online', shareDocument: 'Share Document',
+            productPage: 'Product Page', newAnalysis: 'New Analysis', moorestratProduct: 'MooreStrat',
+            viewOnly: 'View Only Link', wippliHub: 'Wippli HUB', hubStore: 'HUB Store',
+            strategySections: 'Strategy Sections', poweredBy: 'Powered by Wippli®'
+        },
+        fr: {
+            questions: 'Questions', complete: 'Terminé', sections: 'Sections', problems: 'Problèmes', initiatives: 'Initiatives', swotAnalysis: 'Analyse SWOT',
+            high: 'Élevé', medium: 'Moyen', low: 'Faible', avgConfidence: 'Confiance Moy.',
+            website: 'Site Web', boardroomDeck: 'Présentation', quickActions: 'Actions Rapides',
+            strategyReport: 'Rapport Stratégique', viewOnline: 'Voir en ligne', shareDocument: 'Partager le document',
+            productPage: 'Page Produit', newAnalysis: 'Nouvelle Analyse', moorestratProduct: 'MooreStrat',
+            viewOnly: 'Lien lecture seule', wippliHub: 'Wippli HUB', hubStore: 'HUB Store',
+            strategySections: 'Sections Stratégiques', poweredBy: 'Propulsé par Wippli®'
+        }
+    };
+    
+    function setLang(lang) {
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.classList.remove('active');
+            if (btn.textContent === lang.toUpperCase()) btn.classList.add('active');
+        });
+        
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            let text = translations[lang]?.[key];
+            if (text) el.innerHTML = text;
+        });
+        
+        localStorage.setItem('preferredLang', lang);
+    }
+    
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            const lang = localStorage.getItem('preferredLang') || 'en';
+            setLang(lang);
+        }, 250);
+    });
+    
+    document.addEventListener('DOMContentLoaded', () => setLang(localStorage.getItem('preferredLang') || 'en'));
+    </script>
+</body>
+</html>
