@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{client_name}} - Wippli</title>
     <link rel="icon" type="image/png" href="https://app.wippli.ai/favicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Cormorant+Garamond:ital,wght@1,300;1,400&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -59,7 +59,7 @@
         }
         
         .logo {
-            height: 22px;
+            height: 31px;
         }
         
         .header-actions {
@@ -95,7 +95,7 @@
         
         .lang-btn:hover, .lang-btn.active {
             background: var(--blue-light);
-            color: var(--blue);
+            color: var(--white);
         }
 
         .main-scroll {
@@ -154,8 +154,11 @@
         }
         
         .hero-client {
-            font-size: 1.4em;
-            font-weight: 700;
+            font-family: 'Cormorant Garamond', Georgia, serif;
+            font-style: italic;
+            font-weight: 400;
+            font-size: 2.42em;
+            letter-spacing: 0.5px;
             margin-bottom: 4px;
             white-space: nowrap;
             overflow: hidden;
@@ -173,7 +176,7 @@
         .hero-icon {
             width: 64px;
             height: 64px;
-            background: rgba(0,0,0,0.08);
+            background: var(--orange);
             border-radius: 16px;
             display: flex;
             align-items: center;
@@ -189,6 +192,7 @@
         .hero-stats {
             display: flex;
             gap: 40px;
+            margin-top: auto;
         }
         
         .hero-stat {
@@ -266,9 +270,9 @@
             transition: width 0.3s ease;
         }
         
-        .conf-bar-fill.high { background: var(--dark); }
+        .conf-bar-fill.high { background: var(--orange); }
         .conf-bar-fill.medium { background: var(--orange); }
-        .conf-bar-fill.low { background: var(--red); }
+        .conf-bar-fill.low { background: var(--orange); }
         
         .conf-row-label {
             font-size: 0.7em;
@@ -319,7 +323,7 @@
         
         .client-btn.preso-btn {
             background: var(--blue-light);
-            color: var(--dark);
+            color: var(--white);
             font-weight: 600;
         }
         .client-btn.preso-btn:hover {
@@ -327,7 +331,7 @@
             color: var(--white);
         }
         .client-btn.preso-btn svg {
-            stroke: var(--dark);
+            stroke: var(--white);
         }
         .client-btn.preso-btn:hover svg {
             stroke: var(--white);
@@ -396,15 +400,12 @@
             overflow: hidden;
         }
         
-        .action-tile:nth-child(1) { grid-column: span 2; background: var(--orange); }
-        .action-tile:nth-child(2) { background: var(--blue-light); }
-        .action-tile:nth-child(3) { background: var(--dark); }
-        .action-tile:nth-child(4) { background: var(--blue-light); }
-        .action-tile:nth-child(5) { background: var(--dark); }
-        .action-tile:nth-child(6) { grid-column: span 2; background: var(--blue-light); }
-        .action-tile:nth-child(7) { grid-column: span 2; background: var(--blue-light); }
-        .action-tile:nth-child(8) { background: var(--dark); }
-        .action-tile:nth-child(9) { background: var(--dark); }
+        .action-tile:nth-child(1) { grid-column: span 2; background: var(--orange); } /* Download Report */
+        .action-tile:nth-child(2) { background: var(--dark); }                        /* Product Page */
+        .action-tile:nth-child(3) { background: var(--orange); }                      /* New Analysis */
+        .action-tile:nth-child(4) { background: var(--dark); }                        /* MooreStrat */
+        .action-tile:nth-child(5) { grid-column: span 2; background: var(--blue-light); } /* Wippli HUB */
+        .action-tile:nth-child(6) { background: var(--dark); }                        /* HUB Store */
         
         .action-tile .tile-icon svg {
             stroke: var(--white);
@@ -433,19 +434,7 @@
             transform: translateY(-4px);
         }
         
-        .action-tile:nth-child(2) .tile-label,
-        .action-tile:nth-child(4) .tile-label,
-        .action-tile:nth-child(6) .tile-label,
-        .action-tile:nth-child(7) .tile-label {
-            color: var(--dark);
-        }
-        
-        .action-tile:nth-child(2) .tile-icon svg,
-        .action-tile:nth-child(4) .tile-icon svg,
-        .action-tile:nth-child(6) .tile-icon svg,
-        .action-tile:nth-child(7) .tile-icon svg {
-            stroke: var(--dark);
-        }
+        /* All tile labels and icons default to white — no per-tile overrides */
 
         .questions-section {
             padding: 30px;
@@ -496,11 +485,11 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: var(--blue-light);
+            background: var(--orange);
             border-radius: 10px;
             font-size: 0.8em;
             font-weight: 700;
-            color: var(--blue);
+            color: var(--white);
         }
         
         .q-text {
@@ -561,8 +550,7 @@
             .action-grid { grid-template-columns: repeat(3, 1fr); gap: 16px; }
             .action-tile { padding: 20px; border-radius: 18px; gap: 14px; }
             .action-tile:nth-child(1) { grid-column: span 3; }
-            .action-tile:nth-child(6) { grid-column: span 2; }
-            .action-tile:nth-child(7) { grid-column: span 2; }
+            .action-tile:nth-child(5) { grid-column: span 2; }
             .action-tile .tile-icon svg { width: 32px; height: 32px; }
             .action-tile:nth-child(1) .tile-icon svg { width: 40px; height: 40px; }
             .tile-label { font-size: 0.7em; line-height: 1.2; }
@@ -592,8 +580,7 @@
             .action-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
             .action-tile { padding: 16px; border-radius: 16px; gap: 12px; }
             .action-tile:nth-child(1) { grid-column: span 2; }
-            .action-tile:nth-child(6) { grid-column: span 1; }
-            .action-tile:nth-child(7) { grid-column: span 1; }
+            .action-tile:nth-child(5) { grid-column: span 1; }
             .action-tile .tile-icon svg { width: 30px; height: 30px; }
             .action-tile:nth-child(1) .tile-icon svg { width: 36px; height: 36px; }
             .tile-label { font-size: 0.68em; }
@@ -706,28 +693,28 @@
                             <div class="conf-row">
                                 <span class="conf-row-label">S</span>
                                 <div class="conf-bar-bg">
-                                    <div class="conf-bar-fill high" style="width: {{strengths}}%"></div>
+                                    <div class="conf-bar-fill high" style="width: {{strengths_bar_width}}%"></div>
                                 </div>
                                 <span class="conf-row-value">{{strengths}}</span>
                             </div>
                             <div class="conf-row">
                                 <span class="conf-row-label">W</span>
                                 <div class="conf-bar-bg">
-                                    <div class="conf-bar-fill medium" style="width: {{weaknesses}}%"></div>
+                                    <div class="conf-bar-fill medium" style="width: {{weaknesses_bar_width}}%"></div>
                                 </div>
                                 <span class="conf-row-value">{{weaknesses}}</span>
                             </div>
                             <div class="conf-row">
                                 <span class="conf-row-label">O</span>
                                 <div class="conf-bar-bg">
-                                    <div class="conf-bar-fill high" style="width: {{opportunities}}%"></div>
+                                    <div class="conf-bar-fill high" style="width: {{opportunities_bar_width}}%"></div>
                                 </div>
                                 <span class="conf-row-value">{{opportunities}}</span>
                             </div>
                             <div class="conf-row">
                                 <span class="conf-row-label">T</span>
                                 <div class="conf-bar-bg">
-                                    <div class="conf-bar-fill low" style="width: {{threats}}%"></div>
+                                    <div class="conf-bar-fill low" style="width: {{threats_bar_width}}%"></div>
                                 </div>
                                 <span class="conf-row-value">{{threats}}</span>
                             </div>
@@ -763,10 +750,6 @@
                         <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></div>
                         <span class="tile-label" data-i18n="strategyReport">Download Report</span>
                     </a>
-                    <a href="{{doc_share_url}}" target="_blank" class="action-tile">
-                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/><path d="M9 21V9"/></svg></div>
-                        <span class="tile-label" data-i18n="shareDocument">Share Document</span>
-                    </a>
                     <a href="{{creator_url_productStore}}" target="_blank" class="action-tile">
                         <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg></div>
                         <span class="tile-label" data-i18n="productPage">Product Page</span>
@@ -782,10 +765,6 @@
                     <a href="https://app.wippli.ai" target="_blank" class="action-tile">
                         <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><path d="M8 10h8"/><path d="M8 14h4"/></svg></div>
                         <span class="tile-label" data-i18n="wippliHub">Wippli HUB</span>
-                    </a>
-                    <a href="{{doc_view_only_url}}" target="_blank" class="action-tile">
-                        <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-                        <span class="tile-label" data-i18n="viewOnly">View Only Link</span>
                     </a>
                     <a href="{{creator_url_store}}" target="_blank" class="action-tile">
                         <div class="tile-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></div>
