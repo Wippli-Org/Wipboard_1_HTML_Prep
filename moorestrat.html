@@ -801,15 +801,10 @@
             <div class="questions-section">
                 <div class="questions-card">
                     <div class="questions-header">
-                        <span class="questions-title" data-i18n="strategySections">Strategy Sections</span>
-                        <span class="questions-count">{{section_count}} <span data-i18n="sections">sections</span></span>
+                        <span class="questions-title" data-i18n="workshopQuestions">Workshop Questions</span>
+                        <span class="questions-count">{{workshop_question_count}} <span data-i18n="questions">questions</span></span>
                     </div>
-                    {{ ($('CAPTURE_All').item.json.questions || []).slice(0, 5).map(q => `
-                    <div class="question-item">
-                        <div class="q-number">${q.question_id}</div>
-                        <div class="q-text">${q.question_text}</div>
-                        <div class="q-dot high"></div>
-                    </div>`).join('') }}
+                    {{workshop_questions_html}}
                 </div>
             </div>
         </div>
@@ -829,7 +824,7 @@
             strategyReport: 'Strategiebericht', viewOnline: 'Online ansehen', shareDocument: 'Dokument teilen',
             productPage: 'Produkt Seite', newAnalysis: 'Neue Analyse', moorestratProduct: 'MooreStrat',
             viewOnly: 'Nur Ansicht', wippliHub: 'Wippli HUB', hubStore: 'HUB Store',
-            strategySections: 'Strategieabschnitte', poweredBy: 'Powered by Wippli®'
+            poweredBy: 'Powered by Wippli®'
         },
         en: {
             questions: 'Questions', complete: 'Complete', sections: 'Sections', problems: 'Problems', initiatives: 'Initiatives', swotAnalysis: 'SWOT Analysis',
@@ -838,7 +833,7 @@
             strategyReport: 'Strategy Report', viewOnline: 'View Online', shareDocument: 'Share Document',
             productPage: 'Product Page', newAnalysis: 'New Analysis', moorestratProduct: 'MooreStrat',
             viewOnly: 'View Only Link', wippliHub: 'Wippli HUB', hubStore: 'HUB Store',
-            strategySections: 'Strategy Sections', poweredBy: 'Powered by Wippli®'
+            workshopQuestions: 'Workshop Questions', poweredBy: 'Powered by Wippli®'
         },
         fr: {
             questions: 'Questions', complete: 'Terminé', sections: 'Sections', problems: 'Problèmes', initiatives: 'Initiatives', swotAnalysis: 'Analyse SWOT',
@@ -847,7 +842,7 @@
             strategyReport: 'Rapport Stratégique', viewOnline: 'Voir en ligne', shareDocument: 'Partager le document',
             productPage: 'Page Produit', newAnalysis: 'Nouvelle Analyse', moorestratProduct: 'MooreStrat',
             viewOnly: 'Lien lecture seule', wippliHub: 'Wippli HUB', hubStore: 'HUB Store',
-            strategySections: 'Sections Stratégiques', poweredBy: 'Propulsé par Wippli®'
+            poweredBy: 'Propulsé par Wippli®'
         }
     };
     
