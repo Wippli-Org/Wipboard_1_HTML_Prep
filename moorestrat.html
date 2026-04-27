@@ -333,6 +333,9 @@
         .client-btn.preso-btn svg {
             stroke: var(--white);
         }
+        
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
         .client-btn.preso-btn:hover svg {
             stroke: var(--white);
         }
@@ -621,7 +624,10 @@
             .client-btn.preso-btn { background: var(--blue-light); color: var(--dark); font-weight: 600; }
             .client-btn.preso-btn:hover { background: var(--teal-dark); color: var(--white); }
             .client-btn.preso-btn svg { stroke: var(--dark); }
-            .client-btn.preso-btn:hover svg { stroke: var(--white); }
+            
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        .client-btn.preso-btn:hover svg { stroke: var(--white); }
             .client-btn.new-wippli { width: 42px; height: 42px; }
             .plus-icon { font-size: 1.8em; }
             .client-btn svg { width: 14px; height: 14px; }
@@ -730,10 +736,31 @@
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                         <span data-i18n="website">Website</span>
                     </a>
-                    <a href="{{preso_edit_url}}" target="_blank" class="client-btn preso-btn">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-                        <span data-i18n="boardroomDeck">Boardroom Deck</span>
-                    </a>
+                    <div id="presenton-zone"
+                         data-wippli-id="{{wippli_id}}"
+                         data-webhook-url="{{presenton_webhook_url}}"
+                         data-status-url="{{wippli_vibe_status_url}}"
+                         data-status-token="{{wippli_vibe_token}}"
+                         data-pptx-url="{{pptx_url}}"
+                         data-edit-url="{{presenton_edit_url}}"
+                         data-status="{{presenton_status}}"
+                         style="display:contents">
+                        <!-- State A: not generated → Generate button -->
+                        <button id="presenton-generate-btn" type="button" class="client-btn preso-btn" onclick="startPresentonGen(this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                            <span>Generate Presentation</span>
+                        </button>
+                        <!-- State B: generating → spinner -->
+                        <div id="presenton-spinner" class="client-btn preso-btn" style="display:none;cursor:default">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:spin 1s linear infinite"><path d="M21 12a9 9 0 1 1-6.2-8.5"/></svg>
+                            <span id="presenton-spinner-text">Generating…</span>
+                        </div>
+                        <!-- State C: ready → Download -->
+                        <a id="presenton-download-btn" href="#" download class="client-btn preso-btn" style="display:none">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                            <span>Download Presentation</span>
+                        </a>
+                    </div>
                     <a href="{{quick_action_store}}" target="_blank" class="client-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
                         <span data-i18n="productPage">Product</span>
@@ -846,6 +873,76 @@
     });
     
     document.addEventListener('DOMContentLoaded', () => setLang(localStorage.getItem('preferredLang') || 'en'));
+    </script>
+    <script>
+    // Presenton workflow integration: trigger gen + poll wippli-vibe for completion
+    (function(){
+      const zone = document.getElementById('presenton-zone');
+      if (!zone) return;
+      const wippliId   = zone.dataset.wippliId;
+      const webhookUrl = zone.dataset.webhookUrl;
+      const statusUrl  = zone.dataset.statusUrl;
+      const statusTok  = zone.dataset.statusToken;
+      let pollTimer = null;
+
+      function showState(state, opts){
+        const gen   = document.getElementById('presenton-generate-btn');
+        const spin  = document.getElementById('presenton-spinner');
+        const dl    = document.getElementById('presenton-download-btn');
+        gen.style.display  = state === 'idle' ? '' : 'none';
+        spin.style.display = state === 'busy' ? '' : 'none';
+        dl.style.display   = state === 'ready' ? '' : 'none';
+        if (state === 'ready' && opts && opts.url) { dl.href = opts.url; }
+        if (state === 'busy' && opts && opts.text) {
+          document.getElementById('presenton-spinner-text').textContent = opts.text;
+        }
+      }
+
+      async function checkStatus(){
+        try {
+          const r = await fetch(statusUrl, { headers: { 'Authorization': statusTok }});
+          if (!r.ok) return;
+          const data = await r.json();
+          const ctx = (data && data.context_data) || data || {};
+          if (ctx.pptx_url) {
+            clearInterval(pollTimer);
+            showState('ready', { url: ctx.pptx_url });
+          } else if (ctx.presenton_status === 'error' || ctx.presenton_status === 'failed') {
+            clearInterval(pollTimer);
+            showState('busy', { text: 'Generation failed — retry' });
+          }
+        } catch(e) { /* ignore transient fetch errors */ }
+      }
+
+      // Initial state from server-rendered tokens
+      if (zone.dataset.pptxUrl && zone.dataset.pptxUrl.length > 1) {
+        showState('ready', { url: zone.dataset.pptxUrl });
+      } else if (zone.dataset.status === 'pending' || zone.dataset.status === 'queued') {
+        showState('busy', { text: 'Generating…' });
+        pollTimer = setInterval(checkStatus, 10000);
+      } else {
+        showState('idle');
+      }
+
+      window.startPresentonGen = async function(btn){
+        if (!wippliId || !webhookUrl) { alert('Configuration missing'); return; }
+        showState('busy', { text: 'Queueing…' });
+        try {
+          const r = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wippli_id: wippliId })
+          });
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          showState('busy', { text: 'Generating… (~1–2 min)' });
+          pollTimer = setInterval(checkStatus, 10000);
+          checkStatus(); // first immediate check
+        } catch(e) {
+          showState('idle');
+          alert('Failed to start generation: ' + e.message);
+        }
+      };
+    })();
     </script>
 </body>
 </html>
