@@ -760,6 +760,11 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                             <span>Download Presentation</span>
                         </a>
+                        <!-- State D: error → red banner + retry -->
+                        <button id="presenton-error-btn" type="button" class="client-btn preso-btn" style="display:none;background:#fee;color:#b00;border-color:#f99" onclick="window.startPresentonGen(this)">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                            <span id="presenton-error-text">Generation failed — retry</span>
+                        </button>
                     </div>
                     <a href="{{quick_action_store}}" target="_blank" class="client-btn">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg>
@@ -883,35 +888,71 @@
       const webhookUrl = zone.dataset.webhookUrl;
       const statusUrl  = zone.dataset.statusUrl;
       const statusTok  = zone.dataset.statusToken;
+
+      const POLL_MS = 10000;
+      const MAX_ATTEMPTS = 18;        // ~3 min max
+      const MAX_CONSEC_FAILS = 3;     // stop polling after 3 consecutive network errors
       let pollTimer = null;
+      let attempts = 0;
+      let consecFails = 0;
+
+      function stopPoll(){
+        if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+      }
 
       function showState(state, opts){
         const gen   = document.getElementById('presenton-generate-btn');
         const spin  = document.getElementById('presenton-spinner');
         const dl    = document.getElementById('presenton-download-btn');
-        gen.style.display  = state === 'idle' ? '' : 'none';
-        spin.style.display = state === 'busy' ? '' : 'none';
+        const err   = document.getElementById('presenton-error-btn');
+        gen.style.display  = state === 'idle'  ? '' : 'none';
+        spin.style.display = state === 'busy'  ? '' : 'none';
         dl.style.display   = state === 'ready' ? '' : 'none';
+        err.style.display  = state === 'error' ? '' : 'none';
         if (state === 'ready' && opts && opts.url) { dl.href = opts.url; }
         if (state === 'busy' && opts && opts.text) {
           document.getElementById('presenton-spinner-text').textContent = opts.text;
         }
+        if (state === 'error' && opts && opts.text) {
+          document.getElementById('presenton-error-text').textContent = opts.text;
+        }
+      }
+
+      function goError(msg){
+        stopPoll();
+        showState('error', { text: msg || 'Generation failed — retry' });
       }
 
       async function checkStatus(){
+        attempts++;
+        if (attempts > MAX_ATTEMPTS) { goError('Timed out — retry'); return; }
         try {
           const r = await fetch(statusUrl, { headers: { 'Authorization': statusTok }});
-          if (!r.ok) return;
+          if (!r.ok) {
+            consecFails++;
+            if (consecFails >= MAX_CONSEC_FAILS) goError('Status check failing — retry');
+            return;
+          }
+          consecFails = 0;
           const data = await r.json();
           const ctx = (data && data.context_data) || data || {};
           if (ctx.pptx_url) {
-            clearInterval(pollTimer);
+            stopPoll();
             showState('ready', { url: ctx.pptx_url });
           } else if (ctx.presenton_status === 'error' || ctx.presenton_status === 'failed') {
-            clearInterval(pollTimer);
-            showState('busy', { text: 'Generation failed — retry' });
+            goError(ctx.presenton_error || 'Generation failed — retry');
           }
-        } catch(e) { /* ignore transient fetch errors */ }
+        } catch(e) {
+          consecFails++;
+          if (consecFails >= MAX_CONSEC_FAILS) goError('Network error — retry');
+        }
+      }
+
+      function startPolling(){
+        attempts = 0;
+        consecFails = 0;
+        stopPoll();
+        pollTimer = setInterval(checkStatus, POLL_MS);
       }
 
       // Initial state from server-rendered tokens
@@ -919,13 +960,15 @@
         showState('ready', { url: zone.dataset.pptxUrl });
       } else if (zone.dataset.status === 'pending' || zone.dataset.status === 'queued') {
         showState('busy', { text: 'Generating…' });
-        pollTimer = setInterval(checkStatus, 10000);
+        startPolling();
+      } else if (zone.dataset.status === 'error' || zone.dataset.status === 'failed') {
+        showState('error', { text: 'Generation failed — retry' });
       } else {
         showState('idle');
       }
 
       window.startPresentonGen = async function(btn){
-        if (!wippliId || !webhookUrl) { alert('Configuration missing'); return; }
+        if (!wippliId || !webhookUrl) { goError('Configuration missing'); return; }
         showState('busy', { text: 'Queueing…' });
         try {
           const r = await fetch(webhookUrl, {
@@ -935,11 +978,10 @@
           });
           if (!r.ok) throw new Error('HTTP ' + r.status);
           showState('busy', { text: 'Generating… (~1–2 min)' });
-          pollTimer = setInterval(checkStatus, 10000);
+          startPolling();
           checkStatus(); // first immediate check
         } catch(e) {
-          showState('idle');
-          alert('Failed to start generation: ' + e.message);
+          goError('Failed to start: ' + e.message);
         }
       };
     })();
