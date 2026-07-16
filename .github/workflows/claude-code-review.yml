@@ -1,0 +1,51 @@
+name: Claude Code Review
+
+# Automatic AI code review on every pull request, from any author —
+# replaces Gemini Code Assist (sunset). Runs on the Free plan via Actions.
+# Re-review on demand: comment "@claude review" (repos with claude.yml),
+# or re-run via workflow_dispatch.
+
+on:
+  pull_request:
+    types: [opened, ready_for_review]
+  workflow_dispatch:
+
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  claude-review:
+    # Skip drafts and bot-authored PRs (avoids review loops with autofix bots)
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.draft == false &&
+       !endsWith(github.event.pull_request.user.login, '[bot]'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
+      issues: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Run Claude Code Review
+        id: claude-review
+        uses: anthropics/claude-code-action@beta
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          direct_prompt: |
+            Please review this pull request and provide feedback on:
+            - For React components: Performance, accessibility, and best practices
+            - For TypeScript files: Type safety and proper interface usage
+            - For API endpoints: Security, input validation, and error handling
+            - Code quality and best practices
+            - Potential bugs or issues
+            - Performance considerations
+            - Security concerns
+            Be constructive and helpful in your feedback.
