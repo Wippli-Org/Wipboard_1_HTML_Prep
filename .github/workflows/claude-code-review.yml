@@ -1,9 +1,10 @@
 name: Claude Code Review
 
 # Automatic AI code review on every pull request, from any author —
-# replaces Gemini Code Assist (sunset). Runs on the Free plan via Actions.
-# Re-review on demand: comment "@claude review" (repos with claude.yml),
-# or re-run via workflow_dispatch.
+# replaces Gemini Code Assist (sunset). Runs on the GitHub Free plan.
+# Auth: Claude Max subscription token (CLAUDE_CODE_OAUTH_TOKEN repo secret),
+# so reviews cost nothing beyond the existing subscription.
+# Re-run anytime from the Actions tab (workflow_dispatch).
 
 on:
   pull_request:
@@ -38,7 +39,7 @@ jobs:
         id: claude-review
         uses: anthropics/claude-code-action@beta
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           direct_prompt: |
             Please review this pull request and provide feedback on:
             - For React components: Performance, accessibility, and best practices
