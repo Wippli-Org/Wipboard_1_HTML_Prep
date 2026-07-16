@@ -2,26 +2,35 @@ name: Claude Code Review
 
 # Automatic AI code review on every pull request, from any author —
 # replaces Gemini Code Assist (sunset). Runs on the GitHub Free plan.
-# Auth: Claude Max subscription token (CLAUDE_CODE_OAUTH_TOKEN repo secret),
-# so reviews cost nothing beyond the existing subscription.
-# Re-run anytime from the Actions tab (workflow_dispatch).
+# Auth: Claude Max subscription token (CLAUDE_CODE_OAUTH_TOKEN repo secret).
+#
+# Triggers:
+#   - automatically when a PR is opened or marked ready for review
+#   - on demand: comment "/claude review" on any PR (like "/gemini review")
+#   - manually from the Actions tab (workflow_dispatch)
 
 on:
   pull_request:
     types: [opened, ready_for_review]
+  issue_comment:
+    types: [created]
   workflow_dispatch:
 
 concurrency:
-  group: claude-review-${{ github.event.pull_request.number || github.run_id }}
+  group: claude-review-${{ github.event.pull_request.number || github.event.issue.number || github.run_id }}
   cancel-in-progress: true
 
 jobs:
   claude-review:
-    # Skip drafts and bot-authored PRs (avoids review loops with autofix bots)
+    # Auto-run on non-draft, non-bot PRs; on-demand via "/claude review" comment
     if: |
       github.event_name == 'workflow_dispatch' ||
-      (github.event.pull_request.draft == false &&
-       !endsWith(github.event.pull_request.user.login, '[bot]'))
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.draft == false &&
+       !endsWith(github.event.pull_request.user.login, '[bot]')) ||
+      (github.event_name == 'issue_comment' &&
+       github.event.issue.pull_request &&
+       contains(github.event.comment.body, '/claude review'))
     runs-on: ubuntu-latest
     permissions:
       contents: read
